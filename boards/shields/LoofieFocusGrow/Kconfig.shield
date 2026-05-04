@@ -8,3 +8,13 @@ config LOOFIE_FOCUSGROW_US
 config LOOFIE_FOCUSGROW_ISO
     def_bool $(shields_list_contains,LoofieFocusGrow_ISO)
     select LOOFIE_FOCUSGROW
+
+config LOOFIE_FOCUSGROW_NAPE_FG
+    def_bool $(shields_list_contains,LoofieFocusGrow_NapeFg)
+
+config LOOFIE_FOCUSGROW_NAPE_ISO
+    def_bool $(shields_list_contains,LoofieFocusGrow_NapeISO)
+    select LOOFIE_FOCUSGROW_NAPE_FG
+
+config LOOFIE_FOCUSGROW_NAPE_PERI
+    def_bool $(shields_list_contains,LoofieFocusGrow_NapePeri)

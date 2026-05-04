@@ -9,3 +9,45 @@ config SPI
     default y
 
 endif
+
+if LOOFIE_FOCUSGROW_NAPE_FG
+
+config ZMK_KEYBOARD_NAME
+    default "FocusGrowNP ISO" if LOOFIE_FOCUSGROW_NAPE_ISO
+    default "FocusGrowNape"
+
+config ZMK_USB
+    default y
+
+config BT_CENTRAL
+    default y
+
+config ZMK_SPLIT_ROLE_CENTRAL
+    default y
+
+endif
+
+if LOOFIE_FOCUSGROW_NAPE_FG || LOOFIE_FOCUSGROW_NAPE_PERI
+
+config SPI
+    default y
+
+config INPUT
+    default y
+
+config ZMK_POINTING
+    default y
+
+config ZMK_MOUSE
+    default y
+
+config ZMK_SPLIT
+    default y
+
+config ZMK_SPLIT_BLE
+    default y
+
+config ZMK_INPUT_SPLIT
+    default y
+
+endif

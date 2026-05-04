@@ -1,0 +1,100 @@
+#include <physical_layouts.dtsi>
+#include <dt-bindings/zmk/matrix_transform.h>
+#include "LoofieFocusGrow_layout.h"
+
+//                                             w   h    x    y     rot    rx    ry
+#define LAYOUT_NAPE     <&key_physical_attrs 100 100  575  500       0     0     0>  /* 47. Nape Front 1 USB side */ \
+                      , <&key_physical_attrs 100 100  875  500       0     0     0>  /* 48. Nape Front 2 Center   */ \
+                      , <&key_physical_attrs 100 100  975  500       0     0     0>  /* 49. Nape Front 3          */ \
+                      , <&key_physical_attrs 100 100  725  700       0     0     0>  /* 50. Nape Back 1           */ \
+                      , <&key_physical_attrs 100 100  725  800       0     0     0>  /* 51. Nape Back 2           */ \
+                      , <&key_physical_attrs 100 100  725  900       0     0     0>  /* 52. Nape Back 3           */
+
+#define POSITIONS_NAPE   <47 48 49> /* Nape Front */ \
+                       , <50 51 52> /* Nape Back  */
+
+#define TRANSFORM_NAPE   RC(4,0) RC(4,1) RC(4,2) RC(4,3) RC(4,4) RC(4,5)
+
+// With Nape. Support ISO Enter only.
+/ {
+    physical_layout_nape_us: physical_layout_nape_us {
+        compatible = "zmk,physical-layout";
+        display-name = "Loofie FocusGrow [US] With Nape";
+        kscan = <&kscan0>;
+        transform = <&transform_nape_us>;
+        keys = LAYOUT_ROW0_US
+             , LAYOUT_ROW1_US
+             , LAYOUT_ROW2
+             , LAYOUT_ROW3
+             , LAYOUT_NAPE
+             ;
+    };
+
+    physical_layout_nape_iso: physical_layout_nape_iso {
+        compatible = "zmk,physical-layout";
+        display-name = "Loofie FocusGrow [ISO] With Nape";
+        kscan = <&kscan0>;
+        transform = <&transform_nape_iso>;
+        keys = LAYOUT_ROW0_ISO
+             , LAYOUT_ROW1_ISO
+             , LAYOUT_ROW2
+             , LAYOUT_ROW3
+             , LAYOUT_NAPE
+             ;
+    };
+
+    loofie_nape_position_map {
+        compatible = "zmk,physical-layout-position-map";
+        complete;
+
+        nape_us_map: nape_us_map {
+            physical-layout = <&physical_layout_nape_iso>;
+            positions = POSITIONS_LOOFIE
+                      , POSITIONS_NAPE
+                      ;
+        };
+        nape_iso_map: nape_iso_map {
+            physical-layout = <&physical_layout_nape_iso>;
+            positions = POSITIONS_LOOFIE
+                      , POSITIONS_NAPE
+                      ;
+        };
+    };
+
+    transform_nape_us: keymap_transform_nape_us {
+        compatible = "zmk,matrix-transform";
+        rows = <5>;
+        columns = <12>;
+        map = <
+            TRANSFORM_LOOFIE
+            TRANSFORM_NAPE
+        >;
+    };
+
+    transform_nape_iso: keymap_transform_nape_iso {
+        compatible = "zmk,matrix-transform";
+        rows = <5>;
+        columns = <12>;
+        map = <
+            TRANSFORM_LOOFIE
+            TRANSFORM_NAPE
+        >;
+    };
+
+    kscan0: kscan0 {
+        // compatible and diode-direction are commentted here and define in overlay file to build with nape
+        /* compatible = "zmk,kscan-gpio-matrix"; */
+        /* diode-direction = "col2row"; */
+        wakeup-source;
+    };
+
+    split_inputs {
+        #address-cells = <1>;
+        #size-cells = <0>;
+
+        trackball_split: trackball_split@0 {
+            compatible = "zmk,input-split";
+            reg = <0>;
+        };
+    };
+};

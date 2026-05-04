@@ -6,9 +6,16 @@ url: https://github.com/MogmaProducts/loofie-focusgrow-zmk-module
 requires: [xiao_ble/nrf52840/zmk]
 features:
   - keys
+siblings:
+  - loofie_focusgrow_nape_iso
+  - loofie_focusgrow_nape_peri
 
 variants:
   - id: loofie_focusgrow_us
     name: LoofieFocusGrow_US
   - id: loofie_focusgrow_iso
     name: LoofieFocusGrow_ISO
+  - id: loofie_focusgrow_nape_iso
+    name: LoofieFocusGrow_NapeISO
+  - id: loofie_focusgrow_nape_peri
+    name: LoofieFocusGrow_NapePeri

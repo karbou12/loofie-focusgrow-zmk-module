@@ -1,0 +1,110 @@
+#include "LoofieFocusGrow_Nape.dtsi"
+
+/ {
+    // LED aliases required by zmk-rgbled-widget.
+    // The xiao_ble board defines led0/led1/led2 but the rgbled_adapter shield
+    // only ships a seeeduino_xiao_ble.overlay, not xiao_ble.overlay, so we
+    // provide the aliases here directly.
+    aliases {
+        led-red = &led0;
+        led-green = &led1;
+        led-blue = &led2;
+    };
+
+    leds {
+        status = "okay";
+    };
+
+    chosen {
+        zmk,kscan = &kscan0;
+        zmk,physical-layout = &physical_layout_nape_iso;
+    };
+
+};
+
+&transform_nape_iso {
+    row-offset = <4>;
+};
+
+&pinctrl {
+    spi0_default: spi0_default {
+        group1 {
+            psels = <NRF_PSEL(SPIM_SCK, 0, 5)>,   // SCLK
+                    <NRF_PSEL(SPIM_MOSI, 0, 4)>,  // SDIO
+                    <NRF_PSEL(SPIM_MISO, 0, 4)>;  // SDIO
+        };
+    };
+
+    spi0_sleep: spi0_sleep {
+        group1 {
+            psels = <NRF_PSEL(SPIM_SCK, 0, 5)>,   // SCLK
+                    <NRF_PSEL(SPIM_MOSI, 0, 4)>,  // SDIO
+                    <NRF_PSEL(SPIM_MISO, 0, 4)>;  // SDIO
+            low-power-enable;
+        };
+    };
+};
+
+&xiao_serial { status = "disabled"; };
+
+&spi0 {
+    status = "okay";
+    compatible = "nordic,nrf-spim";
+    pinctrl-0 = <&spi0_default>;
+    pinctrl-1 = <&spi0_sleep>;
+    pinctrl-names = "default", "sleep";
+    cs-gpios = <&xiao_d 6 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
+
+    trackball: trackball@0 {
+        status = "okay";
+        compatible = "pixart,pmw3610-alt";
+        reg = <0>;
+        spi-max-frequency = <2000000>;
+        irq-gpios = <&xiao_d 0 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
+
+        // CPI settings: cpi for normal MOVE mode, snipe-cpi for precision mode
+        cpi = <800>;
+        // snipe-cpi = <200>;  // Uncomment and add snipe-layers to enable snipe mode
+
+        // Axis: no hardware inversion here.
+        // X axis inversion is applied in software after rotation via CONFIG_PMW3610_ALT_INVERT_X.
+        // swap-xy;    // Uncomment to swap X/Y at hardware level (pre-rotation)
+        // invert-x;   // Uncomment for hardware-level X inversion (pre-rotation)
+        // invert-y;   // Uncomment for hardware-level Y inversion (pre-rotation)
+
+        // Input event type/codes for mouse pointer movement
+        evt-type = <INPUT_EV_REL>;
+        x-input-code = <INPUT_REL_X>;
+        y-input-code = <INPUT_REL_Y>;
+
+        force-awake;
+
+        // Layer 10 is the scroll layer (handled by trackball_listener above).
+        // Listing it here prevents the orientation layer from updating during scroll.
+        scroll-layers = <8>;
+        /* scroll-layers = <10>; */
+
+        // Snipe layers: uncomment and fill in layer numbers to enable snipe mode
+        // snipe-layers = <11>;
+
+        // Default orientation layer at boot (0 = 0°, 1 = 45°, ... 7 = 315°)
+        default-orientation-layer = <0>;
+    };
+};
+
+&kscan0 {
+    compatible = "zmk,kscan-gpio-direct";
+
+    input-gpios =
+        <&xiao_d 10 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>,  // 表面 左キー
+        <&xiao_d 9  (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>,  // 表面 中央キー
+        <&xiao_d 8  (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>,  // 表面 右キー
+        <&xiao_d 1  (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>,  // 裏面 上スイッチ
+        <&xiao_d 2  (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>,  // 裏面 中央スイッチ
+        <&xiao_d 3  (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>;  // 裏面 下スイッチ
+};
+
+
+&trackball_split {
+    device = <&trackball>;
+};

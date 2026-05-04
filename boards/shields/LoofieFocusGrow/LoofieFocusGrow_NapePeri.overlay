@@ -19,7 +19,6 @@
         zmk,kscan = &kscan0;
         zmk,physical-layout = &physical_layout_nape_iso;
     };
-
 };
 
 &transform_nape_iso {
@@ -79,10 +78,8 @@
 
         force-awake;
 
-        // Layer 10 is the scroll layer (handled by trackball_listener above).
         // Listing it here prevents the orientation layer from updating during scroll.
-        scroll-layers = <8>;
-        /* scroll-layers = <10>; */
+        // scroll-layers = <8>;
 
         // Snipe layers: uncomment and fill in layer numbers to enable snipe mode
         // snipe-layers = <11>;
@@ -103,7 +100,6 @@
         <&xiao_d 2  (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>,  // 裏面 中央スイッチ
         <&xiao_d 3  (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>;  // 裏面 下スイッチ
 };
-
 
 &trackball_split {
     device = <&trackball>;

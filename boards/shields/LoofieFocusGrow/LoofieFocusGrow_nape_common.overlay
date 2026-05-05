@@ -58,6 +58,12 @@
                              ;
         };
 
+        snipe_layer {
+            // Lower layers of Loofie, and snipe layer of Nape.
+            layers = <2 6 9>;
+            input-processors = <&zip_xy_scaler 1 4>;
+        };
+
         // zip_window_gesture should be implemented in keymap file.
         adjust_layer {
             layers = <3 7>;

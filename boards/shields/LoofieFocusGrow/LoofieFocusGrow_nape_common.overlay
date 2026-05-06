@@ -1,6 +1,8 @@
 #include "LoofieFocusGrow_Nape.dtsi"
 #include <dt-bindings/zmk/input_transform.h>
 #include <zmk-input-inertia/input/processor/input_inertia.dtsi>
+#include <input_processors/trackball_shift.dtsi>
+#include <input_processors/trackball_direction_detection.dtsi>
 
 &xiao_spi {
     status = "okay";
@@ -47,12 +49,14 @@
         compatible = "zmk,input-listener";
         status = "okay";
         device = <&trackball_split>;
-        input-processors = <&zip_mouse_gesture>;
+        input-processors = <&zip_trackball_shift>
+                         , <&zip_mouse_gesture>;
 
         scroller {
             // Raise layers of Loofie, and scroll layer of Nape.
             layers = <1 5 8>;
-            input-processors = <&zip_xy_to_scroll_mapper &zip_scroll_scaler 1 100>
+            input-processors = <&zip_trackball_shift>
+                             , <&zip_xy_to_scroll_mapper &zip_scroll_scaler 1 100>
                              , <&zip_scroll_transform INPUT_TRANSFORM_X_INVERT>
                              , <&zip_inertia>
                              ;
@@ -61,13 +65,20 @@
         snipe_layer {
             // Lower layers of Loofie, and snipe layer of Nape.
             layers = <2 6 9>;
-            input-processors = <&zip_xy_scaler 1 4>;
+            input-processors = <&zip_trackball_shift>
+                             , <&zip_xy_scaler 1 4>;
         };
 
         // zip_window_gesture should be implemented in keymap file.
         adjust_layer {
             layers = <3 7>;
-            input-processors = <&zip_window_gesture>;
+            input-processors = <&zip_trackball_shift>
+                             , <&zip_window_gesture>;
+        };
+
+        trackball_shift_detection {
+            layers = <10>;
+            input-processors = <&zip_trackball_direction_detection>;
         };
     };
 };
@@ -87,4 +98,9 @@
     scroll-report-interval-ms = <65>;  // スクロールレポート間隔 (ms)
     scroll-threshold-start = <1>;      // 慣性が発動する最小スクロール量 (pix/report)
     scroll-threshold-stop = <0>;       // 慣性が停止するスクロール量 (pix/report)
+};
+
+&zip_trackball_shift {
+    direction-angle-degree = <45>;
+    default-device-angle-degree = <0>;
 };

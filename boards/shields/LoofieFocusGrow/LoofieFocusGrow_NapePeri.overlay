@@ -1,4 +1,5 @@
 #include "LoofieFocusGrow_Nape.dtsi"
+#include <input/processors/report_rate_limit.dtsi>
 
 / {
     // LED aliases required by zmk-rgbled-widget.
@@ -90,4 +91,5 @@
 
 &trackball_split {
     device = <&trackball>;
+    input-processors = <&zip_report_rate_limit 16>;
 };

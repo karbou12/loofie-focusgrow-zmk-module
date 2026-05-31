@@ -87,6 +87,15 @@
             layers = <10>;
             input-processors = <&zip_trackball_direction_detection>;
         };
+
+        // zip_app_gesture should be implemented in keymap file.
+        app_gesture_layer {
+            layers = <11>;
+            input-processors = <
+                &zip_trackball_shift
+                &zip_app_gesture
+            >;
+        };
     };
 };
 

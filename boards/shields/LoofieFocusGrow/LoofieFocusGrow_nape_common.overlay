@@ -1,0 +1,117 @@
+#include "LoofieFocusGrow_Nape.dtsi"
+#include <dt-bindings/zmk/input_transform.h>
+#include <zmk-input-inertia/input/processor/input_inertia.dtsi>
+#include <input_processors/trackball_shift.dtsi>
+#include <input_processors/trackball_direction_detection.dtsi>
+
+&xiao_spi {
+    status = "okay";
+    cs-gpios = <&xiao_d 7 GPIO_ACTIVE_LOW>;
+    shifter: 595@0 {
+        compatible = "zmk,gpio-595";
+        status = "okay";
+        gpio-controller;
+        spi-max-frequency = <200000>;
+        reg = <0>;
+        #gpio-cells = <2>;
+        ngpios = <16>;
+    };
+};
+
+&kscan0 {
+    compatible = "zmk,kscan-gpio-matrix";
+    diode-direction = "col2row";
+    col-gpios
+        = <&shifter 1 GPIO_ACTIVE_HIGH>
+        , <&shifter 2 GPIO_ACTIVE_HIGH>
+        , <&shifter 3 GPIO_ACTIVE_HIGH>
+        , <&shifter 4 GPIO_ACTIVE_HIGH>
+        , <&shifter 5 GPIO_ACTIVE_HIGH>
+        , <&shifter 6 GPIO_ACTIVE_HIGH>
+        , <&shifter 9 GPIO_ACTIVE_HIGH>
+        , <&shifter 10 GPIO_ACTIVE_HIGH>
+        , <&shifter 11 GPIO_ACTIVE_HIGH>
+        , <&shifter 12 GPIO_ACTIVE_HIGH>
+        , <&shifter 13 GPIO_ACTIVE_HIGH>
+        , <&shifter 14 GPIO_ACTIVE_HIGH>
+    ;
+
+    row-gpios
+        = <&xiao_d 0 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>
+        , <&xiao_d 1 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>
+        , <&xiao_d 2 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>
+        , <&xiao_d 3 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>
+    ;
+};
+
+/ {
+    trackball_listener: trackball_listener {
+        compatible = "zmk,input-listener";
+        status = "okay";
+        device = <&trackball_split>;
+        input-processors = <
+            &zip_trackball_shift
+            &zip_mouse_gesture
+        >;
+
+        scroller {
+            // Raise layers of Loofie, and scroll layer of Nape.
+            layers = <1 5 8>;
+            input-processors = <
+                &zip_trackball_shift
+                &zip_xy_to_scroll_mapper &zip_scroll_scaler 1 100
+                &zip_scroll_transform INPUT_TRANSFORM_X_INVERT
+                &zip_inertia
+            >;
+        };
+
+        snipe_layer {
+            // Lower layers of Loofie, and snipe layer of Nape.
+            layers = <2 6 9>;
+            input-processors = <
+                &zip_trackball_shift
+                &zip_xy_scaler 1 4
+            >;
+        };
+
+        // zip_window_gesture should be implemented in keymap file.
+        adjust_layer {
+            layers = <3 7>;
+            input-processors = <
+                &zip_trackball_shift
+                &zip_window_gesture
+            >;
+        };
+
+        trackball_shift_detection {
+            layers = <10>;
+            input-processors = <&zip_trackball_direction_detection>;
+        };
+
+        // zip_app_gesture should be implemented in keymap file.
+        app_gesture_layer {
+            layers = <11>;
+            input-processors = <
+                &zip_trackball_shift
+                &zip_app_gesture
+            >;
+        };
+    };
+};
+
+&zip_inertia {
+    // 慣性が始まるまでの待ち時間 (推奨: センサーのポーリングレートの2倍以上)
+    trigger-ms = <35>; 
+
+    // --- マウス移動の設定 ---
+    move-decay-factor-int = <90>;       // 減衰率 (0-100)
+    move-report-interval-ms = <35>;     // レポート送信間隔 (ms)
+    move-threshold-start = <15>;        // 慣性が発動する最小移動量 (pix/report)
+    move-threshold-stop = <1>;          // 慣性が停止する移動量 (pix/report)
+
+    // --- スクロールの設定 ---
+    scroll-decay-factor-int = <90>;    // スクロール減衰率
+    scroll-report-interval-ms = <65>;  // スクロールレポート間隔 (ms)
+    scroll-threshold-start = <1>;      // 慣性が発動する最小スクロール量 (pix/report)
+    scroll-threshold-stop = <0>;       // 慣性が停止するスクロール量 (pix/report)
+};
